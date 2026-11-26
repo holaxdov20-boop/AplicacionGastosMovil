@@ -1,0 +1,51 @@
+// Versión inicial de main.dart (sin autenticación), usada por scripts/git_flow.sh
+// para el historial de Git. La versión final con login está en lib/main.dart.
+import 'package:flutter/material.dart';
+import 'package:gastos_app/app.dart';
+import 'package:gastos_app/config/config_faltante.dart';
+import 'package:gastos_app/config/env.dart';
+import 'package:gastos_app/data/categoria_repository.dart';
+import 'package:gastos_app/data/gasto_repository.dart';
+import 'package:gastos_app/data/presupuesto_repository.dart';
+import 'package:gastos_app/providers/gastos_provider.dart';
+import 'package:gastos_app/screens/home_screen.dart';
+import 'package:gastos_app/services/crypto_service.dart';
+import 'package:gastos_app/services/notification_service.dart';
+import 'package:gastos_app/services/sync_service.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es_MX');
+
+  if (!Env.configurado) {
+    runApp(const MaterialApp(home: ConfigFaltante()));
+    return;
+  }
+
+  await Supabase.initialize(
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
+  );
+
+  final notificaciones = NotificationService();
+  await notificaciones.init();
+  await notificaciones.programarRecordatorioSemanal();
+
+  final crypto = CryptoService();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => GastosProvider(
+        gastoRepo: GastoRepository(crypto),
+        categoriaRepo: CategoriaRepository(),
+        presupuestoRepo: PresupuestoRepository(),
+        sync: SyncService(),
+        notificaciones: notificaciones,
+      ),
+      child: const GastosApp(home: HomeScreen()),
+    ),
+  );
+}

@@ -1,0 +1,43 @@
+name: gastos_app
+description: MVP de gestión de gastos personales (Flutter + SQLite + Supabase).
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Persistencia local
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  uuid: ^4.4.2
+
+  # Servicios web (autenticación + sincronización)
+  supabase_flutter: ^2.5.6
+
+  # Seguridad
+  flutter_secure_storage: ^9.2.2
+  encrypt: ^5.0.3
+  local_auth: ^2.3.0
+
+  # Notificaciones
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+
+  # UI / formato
+  fl_chart: ^0.69.0
+  intl: any
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
